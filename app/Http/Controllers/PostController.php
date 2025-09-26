@@ -12,17 +12,43 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        $page = $request->query('page', 1);
+
+        $perPage = 4;
+
+        $posts = Post::latest()->paginate($perPage);
+
+        $postsData = $posts->items(); // Get the items for the current page
+
+        $hasMorePages = $posts->hasMorePages(); // Check if there are more pages
+
+        $total = $posts->total(); // Get the total number of items
+
         return Inertia::render('Posts/Index', [
-            'posts' => fn() => Post::all(),
-            'stats' => Inertia::optional(fn() => [
-                'total' => Post::count(),
-                'published' => Post::where('published', true)->count(),
-                'unpublished' => Post::where('published', false)->count(),
-            ]),
-            'user' => Inertia::always( Auth::user()),
+            'posts' => $page === 1 ? $postsData : Inertia::merge($postsData),
+            'pagination' => [
+                'currentPage' => $page,
+                'perPage' => $perPage,
+                'hasMorePages' => $hasMorePages,
+                'total' => $total,
+            ],
         ]);
+
+
+        // return Inertia::render('Posts/Index', [
+        //     'posts' => fn() => Post::all(),
+        //     'stats' => Inertia::optional(fn() => [
+        //         'total' => Post::count(),
+        //         'published' => Post::where('published', true)->count(),
+        //         'unpublished' => Post::where('published', false)->count(),
+        //     ]),
+        //     'user' => Inertia::always( Auth::user()),
+        // ]);
+
+
     }
 
     /**

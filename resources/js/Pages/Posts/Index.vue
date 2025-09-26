@@ -1,31 +1,45 @@
 <template>
-    <div class="max-w-4xl mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6">Posts</h1>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4" @click="reloadPosts">Reload Posts</button>
-
-        <!-- start card -->
-        <div class="bg-white shadow-sm rounded-lg p-4 mt-6 mb-6">
-            <p class="text-gray-700 mb-2">User: {{ $page.props.auth.user.name }}</p>
-            <p class="text-gray-700 mb-4">Total Posts: {{ $page.props?.stats?.total }}</p>
+    <div class="max-w-4xl mx-auto p-8">
+        <div class="flex flex-col md-flex-row md-justify-between md-items-center mb-6">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4 md:mb-0">Posts</h1>
+            <div class="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm">
+                {{ posts.length }} Post {{ posts.length != 1 ? 's' : '' }} loaded of {{ $page.props.pagination.total }} total
+            </div>
         </div>
-        <!-- end card -->
 
-        <ul class="space-y-2" v-if="$page.props.posts">
-            <li v-for="post in $page.props.posts" :key="post.id" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">{{ post.title }}</li>
-        </ul>
+        <div class="space-y-4 mb-8">
+            <div v-for="post in posts" :key="post.id" class="bg-white border border-gray-200 p-6 rounded-xl transition hover:bg-gray-100">
+                <div class="space-y-2">
+                    <h3 class=" text-xl font-semibold text-gray-900 loading-snug">{{ post.title }}</h3>
+                    <div class="text-sm text-gray-500 font-medium">Post #{{ post.id }}</div>
+                </div>
+            </div>
+        </div>
 
-        <ul class="space-y-2" v-else>
-            <li class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">No Posts Found</li>
-        </ul>
+        <div class="flex justify-center p-4">
+            <button v-if="hasMore" @click="loadMore" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-2 px-4 rounded">Load More Posts</button>
+            <div v-else class="text-center p-4 text-gray-500 font-medium bg-gray-100" >
+                <span> You've reached the end</span>
+            </div>
+        </div>
 
     </div>
 </template>
 
 <script setup>
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3'
+import { computed} from "vue";
 
-const reloadPosts = () => {
-    router.reload( { only: ['posts', 'stats'] } );
+const posts = computed(() => usePage().props.posts);
+const hasMore = computed(() => usePage().props.pagination.hasMorePages);
+const currentPage = computed(() => parseInt(usePage().props.pagination.currentPage));
+
+const loadMore = () => {
+    router.reload({
+        data: { page: currentPage.value + 1 },
+        only: ['posts', 'pagination'],
+        preserveState: true,
+    });
 };
 </script>
 
