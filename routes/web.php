@@ -4,6 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -39,3 +40,5 @@ Route::inertia('/login', 'Auth/Login')->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->name('update-avatar');
+
+Route::resource('posts', PostController::class);
