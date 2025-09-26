@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -42,3 +43,5 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->name('update-avatar');
 
 Route::resource('posts', PostController::class);
+
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
