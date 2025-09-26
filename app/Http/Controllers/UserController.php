@@ -11,7 +11,8 @@ class UserController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Users', ['username' => Auth::user()?->name ?? 'Guest']);
+        // return Inertia::render('Users', ['username' => Auth::user()?->name ?? 'Guest']);
+        return Inertia::render('Users');
     }
 
     public function updateAvatar(Request $request)
@@ -26,7 +27,7 @@ class UserController extends Controller
 
          // ✅ لو فيه صورة جديدة
         if ($request->hasFile('avatar')) {
-            
+
             // لو عنده صورة قديمة نحذفها
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
@@ -44,8 +45,13 @@ class UserController extends Controller
 
         $user->save();
 
-        // 🔥 هنا استخدم redirect بدل render
-        // عشان Inertia يعمل refresh للـ props
-        return redirect()->back()->with('success', 'Profile updated successfully!');
+        if($user->save()){
+            // 🔥 هنا استخدم redirect بدل render
+            // عشان Inertia يعمل refresh للـ props
+            return redirect()->back()->with('success', 'Profile updated successfully!');
+        }else{
+            return redirect()->back()->with('error', 'Failed to update profile.');
+        }
+
     }
 }
